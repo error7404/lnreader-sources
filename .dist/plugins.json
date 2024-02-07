@@ -1,0 +1,13 @@
+{
+	"Vietnamese": [
+		{
+			"id": "ln.hako",
+			"name": "Hako",
+			"site": "https://ln.hako.vn",
+			"lang": "Vietnamese",
+			"version": "1.0.1",
+			"url": "https://raw.githubusercontent.com/LNReader/lnreader-sources/beta-dist/.js/plugins/vietnamese/LNHako.js",
+			"iconUrl": "https://raw.githubusercontent.com/LNReader/lnreader-sources/beta-dist/icons/src/vi/hakolightnovel/icon.png"
+		}
+	]
+}
