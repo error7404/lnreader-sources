@@ -6,10 +6,11 @@ import { Plugin } from "@typings/plugin";
 class LSHNovel implements Plugin.PluginBase {
     id = "lshnovel";
     name = "Liebe Schnee Hiver Novel";
-    icon = "multisrc/wpmangastream/icons/lshnovel.png";
+    icon = "multisrc/lightnovelwp/lshnovel.png";
     site = "https://lshnovel.com/";
     version = "1.0.0";
-
+
+
     async popularNovels(
         pageNo: number,
         { filters }: Plugin.PopularNovelsOptions<typeof this.filters>

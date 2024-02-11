@@ -6,10 +6,11 @@ import { Plugin } from "@typings/plugin";
 class KolNovel implements Plugin.PluginBase {
     id = "kolnovel";
     name = "KolNovel";
-    icon = "multisrc/wpmangastream/icons/kolnovel.png";
+    icon = "multisrc/lightnovelwp/kolnovel.png";
     site = "https://kolnovel.lol/";
     version = "1.0.0";
-
+
+
     async popularNovels(
         pageNo: number,
         { filters }: Plugin.PopularNovelsOptions<typeof this.filters>

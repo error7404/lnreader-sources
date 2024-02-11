@@ -6,10 +6,11 @@ import { Plugin } from "@typings/plugin";
 class LightNovelBrasil implements Plugin.PluginBase {
     id = "lightnovelbrasil";
     name = "Light Novel Brasil";
-    icon = "multisrc/wpmangastream/icons/lightnovelbrasil.png";
+    icon = "multisrc/lightnovelwp/lightnovelbrasil.png";
     site = "https://lightnovelbrasil.com/";
     version = "1.0.0";
-
+
+
     async popularNovels(
         pageNo: number,
         { filters }: Plugin.PopularNovelsOptions<typeof this.filters>
