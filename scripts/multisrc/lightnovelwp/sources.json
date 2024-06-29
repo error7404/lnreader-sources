@@ -10,7 +10,7 @@
   },
   {
     "id": "kolnovel",
-    "sourceSite": "https://kolnovel.club/",
+    "sourceSite": "https://kolbook.xyz/",
     "sourceName": "Kol Novel",
     "options": {
       "lang": "Arabic",
@@ -193,6 +193,15 @@
     "id": "cpunovel",
     "sourceSite": "https://cpunovel.com/",
     "sourceName": "CPUnovel",
+    "options": {
+      "lang": "English",
+      "reverseChapters": true
+    }
+  },
+  {
+    "id": "requiemtls",
+    "sourceSite": "https://requiemtls.com/",
+    "sourceName": "Requiem Translations",
     "options": {
       "lang": "English",
       "reverseChapters": true
