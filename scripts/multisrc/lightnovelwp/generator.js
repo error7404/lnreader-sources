@@ -1,15 +1,22 @@
 import list from './sources.json' with { type: 'json' };
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const generateAll = function () {
+  list.sort((a, b) => a.id.length - b.id.length);
   return list.map(source => {
-    let filters = {};
     try {
-      filters = require(`./filters/${source.id}`);
-      source.filters = filters.filters;
+      const filters = JSON.parse(
+        readFileSync(`${__dirname}/filters/${source.id}.json`, 'utf-8'),
+      );
+      source.filters = filters;
     } catch (e) {}
     console.log(
-      `[lightnovelwp] Generating: ${source.id}${' '.repeat(20 - source.id.length)} ${source.filters ? '🔎with filters🔍' : '🚫no filters🚫'}`,
+      `[lightnovelwp] Generating: ${source.id}`.padEnd(50),
+      source.filters ? '🔎with filters🔍' : '🚫 no filters 🚫',
     );
     return generator(source);
   });

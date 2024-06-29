@@ -1,15 +1,22 @@
 import list from './sources.json' with { type: 'json' };
 import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const generateAll = function () {
+  list.sort((a, b) => a.id.length - b.id.length);
   return list.map(metadata => {
-    let filters = {};
     try {
-      filters = require(`./filters/${metadata.id}`);
-      metadata.filters = filters.filters;
+      const filters = JSON.parse(
+        readFileSync(`${__dirname}/filters/${metadata.id}.json`, 'utf-8'),
+      );
+      metadata.filters = filters;
     } catch (e) {}
     console.log(
-      `[madara] Generating: ${metadata.id}${' '.repeat(20 - metadata.id.length)} ${metadata.filters ? '🔎with filters🔍' : '🚫no filters🚫'}`,
+      `[madara] Generating: ${metadata.id}`.padEnd(40),
+      metadata.filters ? '🔎with filters🔍' : '🚫 no filters 🚫',
     );
     return generator(metadata);
   });
