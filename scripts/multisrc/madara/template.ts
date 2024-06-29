@@ -5,6 +5,9 @@ import { Cheerio, AnyNode, CheerioAPI, load as parseHTML } from 'cheerio';
 import { defaultCover } from '@libs/defaultCover';
 import { NovelStatus } from '@libs/novelStatus';
 import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+
+dayjs.extend(localizedFormat);
 
 const includesAny = (str: string, keywords: string[]) =>
   new RegExp(keywords.join('|')).test(str);
@@ -42,6 +45,9 @@ class MadaraPlugin implements Plugin.PluginBase {
     this.version = `1.0.${2 + versionIncrements}`;
     this.options = metadata.options;
     this.filters = metadata.filters;
+    const lang = metadata.options?.lang || 'en';
+    dayjs.locale(lang);
+    console.log(dayjs.locale());
   }
 
   translateDragontea(text: Cheerio<AnyNode>): Cheerio<AnyNode> {
@@ -361,11 +367,10 @@ class MadaraPlugin implements Plugin.PluginBase {
     } else if (includesAny(date, ['year', 'año'])) {
       dayJSDate = dayJSDate.subtract(timeAgoInt, 'year'); // go back N years
     } else {
-      try {
+      if (dayjs(date).format('LL') !== 'Invalid Date') {
         return dayjs(date).format('LL');
-      } catch (e) {
-        return date;
       }
+      return date;
     }
 
     return dayJSDate.format('LL');
