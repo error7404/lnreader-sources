@@ -59,6 +59,8 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
     res.write(chunk);
   });
   proxyRes.on('end', function () {
+    res.setHeader('Access-Control-Allow-Origin', CLIENT_HOST);
+    res.setHeader('Access-Control-Allow-Credentials', true);
     res.end();
   });
 });
@@ -72,6 +74,8 @@ const cookiesHandler = (req, res) => {
   });
   req.on('end', () => {
     temp_cookies = cookies;
+    res.setHeader('Access-Control-Allow-Origin', CLIENT_HOST);
+    res.setHeader('Access-Control-Allow-Credentials', true);
     res.end();
   });
 };
