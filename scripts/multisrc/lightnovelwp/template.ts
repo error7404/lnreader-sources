@@ -1,5 +1,6 @@
 import { load } from 'cheerio';
 import { Parser } from 'htmlparser2';
+import { Buffer } from 'buffer';
 import { fetchApi } from '@libs/fetch';
 import { Plugin } from '@typings/plugin';
 import { NovelStatus } from '@libs/novelStatus';

@@ -117,7 +117,7 @@
       "lang": "English",
       "reverseChapters": true,
       "versionIncrements": 1,
-      "customJs": "return Buffer.from($('textarea').text(), 'base64').toString('utf-8');"
+      "customJs": "return Buffer.from($('textarea').text(), 'base64').toString('utf-8').replace('\\n', '\\r\\n');"
     }
   },
   {
