@@ -12,8 +12,7 @@
     "sourceSite": "https://zinnovel.com/",
     "sourceName": "ZinnNovel",
     "options": {
-      "down": true,
-      "downSince": "2024-03-04"
+      "versionIncrements": 2
     }
   },
   {
