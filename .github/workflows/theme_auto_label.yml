@@ -75,38 +75,20 @@ jobs:
           USER_AGENT: ${{ steps.get_user_agent.outputs.USER_AGENT }}
         run: |
           if curl --location --silent --fail "https://api.$BASE_URL" -H "User-Agent: $USER_AGENT" | grep -q "Hello\!"; then
-            echo "hotnovelpub=true" >> $GITHUB_OUTPUT
-            echo "✅ HotNovelPub Theme Detected" >> $GITHUB_STEP_SUMMARY
-          elif curl --location --silent --fail "http://api.$BASE_URL" -H "User-Agent: $USER_AGENT" | grep -q "Hello\!"; then
-            echo "hotnovelpub=true" >> $GITHUB_OUTPUT
-            echo "✅ HotNovelPub Theme Detected" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "hotnovelpub=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check LightNovelWorld Theme
-        id: check_lightnovelworld
-        env:
-          BASE_URL: ${{ steps.get_base_url.outputs.BASE_URL }}
-          USER_AGENT: ${{ steps.get_user_agent.outputs.USER_AGENT }}
-        run: |
-          if curl --location --silent --fail "https://$BASE_URL/getwebappmsg" -H "User-Agent: $USER_AGENT" | grep -q "{\"\$id\":\"1\",\"success\":false}"; then
-            echo "lighnovelworld=true" >> $GITHUB_OUTPUT
-            echo "✅ LightNovelWorld Theme Detected" >> $GITHUB_STEP_SUMMARY
-          elif curl --location --silent --fail "http://$BASE_URL/getwebappmsg" -H "User-Agent: $USER_AGENT" | grep -q "{\"\$id\":\"1\",\"success\":false}"; then
-            echo "lighnovelworld=true" >> $GITHUB_OUTPUT
-            echo "✅ LightNovelWorld Theme Detected" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "lighnovelworld=false" >> $GITHUB_OUTPUT
-          fi
-
+          echo "hotnovelpub=true" >> $GITHUB_OUTPUT
+          echo "✅ HotNovelPub Theme Detected" >> $GITHUB_STEP_SUMMARY
+            elif curl --location --silent --fail "http://api.$BASE_URL" -H "User-Agent: $USER_AGENT" | grep -q "Hello\!"; then
+          echo "hotnovelpub=true" >> $GITHUB_OUTPUT
+          echo "✅ HotNovelPub Theme Detected" >> $GITHUB_STEP_SUMMARY
+            else
+          echo "hotnovelpub=false" >> $GITHUB_OUTPUT
+            fi
 
       - name: Add Label
         env:
           MADARA: ${{ steps.check_madara.outputs.madara }}
           LIGHNOVELWP: ${{ steps.check_lighnovelwp.outputs.lighnovelwp }}
           HOTNOVELPUB: ${{ steps.check_hotnovelpub.outputs.hotnovelpub }}
-          LIGHTNOVELWORLD: ${{ steps.check_lightnovelworld.outputs.lightnovelworld }}
           GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "$MADARA" == "true" ]]; then
@@ -115,8 +97,6 @@ jobs:
             gh issue edit $ISSUE_NUMBER --add-label "Theme: Lighnovelwp" -R $REPO
           elif [[ "$HOTNOVELPUB" == "true" ]]; then
             gh issue edit $ISSUE_NUMBER --add-label "Theme: Hotnovelpub" -R $REPO
-          elif [[ "$LIGHTNOVELWORLD" == "true" ]]; then
-            gh issue edit $ISSUE_NUMBER --add-label "Theme: Lightnovelworld" -R $REPO
           else
             echo "No Theme Detected" >> $GITHUB_STEP_SUMMARY
           fi
