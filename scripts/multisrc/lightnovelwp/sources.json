@@ -101,12 +101,12 @@
   },
   {
     "id": "novelsknight",
-    "sourceSite": "https://faloonovels.online/",
+    "sourceSite": "https://novelsknight.punchmanga.online/",
     "sourceName": "NovelsKnight",
     "options": {
       "lang": "English",
       "reverseChapters": true,
-      "versionIncrements": 1
+      "versionIncrements": 2
     }
   },
   {
