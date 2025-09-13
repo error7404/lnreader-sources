@@ -107,7 +107,7 @@
       "lang": "English",
       "reverseChapters": true,
       "versionIncrements": 2,
-      "customJs": "$('.announ').remove();         return $('.epcontent').eq(-1).find('p').map(function (i, el) {          return $(this).text();        }).toArray().join('\\n') || '';"
+      "customJs": "$('.announ').remove();         return $('.epcontent').eq(-1).html() || '';"
     }
   },
   {
