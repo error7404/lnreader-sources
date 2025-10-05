@@ -7,7 +7,7 @@ class WTRLAB implements Plugin.PluginBase {
   id = 'WTRLAB';
   name = 'WTR-LAB';
   site = 'https://wtr-lab.com/';
-  version = '1.0.1';
+  version = '1.0.2';
   icon = 'src/en/wtrlab/icon.png';
   sourceLang = 'en/';
 
@@ -98,27 +98,31 @@ class WTRLAB implements Plugin.PluginBase {
       .text()
       .replace(/[\t\n]/g, '');
 
-    const chapterJson = loadedCheerio('#__NEXT_DATA__').html() + '';
-    const jsonData: NovelJson = JSON.parse(chapterJson);
+    const novelId = novelPath.split('/')[3];
+    const novelSlug = novelPath.split('/')[4];
 
-    const chapters: Plugin.ChapterItem[] =
-      jsonData.props.pageProps.serie.chapters.map(
-        (jsonChapter, chapterIndex) => ({
-          name: jsonChapter.title,
-          path:
-            this.sourceLang +
-            'serie-' +
-            jsonData.props.pageProps.serie.serie_data.raw_id +
-            '/' +
-            jsonData.props.pageProps.serie.serie_data.slug +
-            '/chapter-' +
-            jsonChapter.order, // Assuming 'slug' is the intended path
-          releaseTime: (
-            jsonChapter?.created_at || jsonChapter?.updated_at
-          )?.substring(0, 10),
-          chapterNumber: chapterIndex + 1,
-        }),
-      );
+    const jsonData: Serie = await fetchApi(
+      this.site + 'api/chapters/' + novelId,
+    ).then(r => r.json());
+
+    const chapters: Plugin.ChapterItem[] = jsonData.chapters.map(
+      (jsonChapter, chapterIndex) => ({
+        name: jsonChapter.title,
+        path:
+          this.sourceLang +
+          'novel/' +
+          novelId +
+          '/' +
+          novelSlug +
+          '/old' +
+          '/chapter-' +
+          jsonChapter.order, // Assuming 'slug' is the intended path
+        releaseTime: (
+          jsonChapter?.created_at || jsonChapter?.updated_at
+        )?.substring(0, 10),
+        chapterNumber: chapterIndex + 1,
+      }),
+    );
 
     novel.chapters = chapters;
 
