@@ -5,6 +5,8 @@ import { Connect } from 'vite';
 import httpProxy from 'http-proxy';
 import { exec } from 'child_process';
 import { brotliDecompressSync, gunzipSync, zstdDecompressSync } from 'zlib';
+import path from 'path';
+import { writeFileSync } from 'fs';
 
 const proxy = httpProxy.createProxyServer({});
 
@@ -114,8 +116,36 @@ const proxyRequest: Connect.SimpleHandleFunction = (req, res) => {
     console.log('\t', '\x1b[32m', name + ':', '\x1b[37m', value);
   });
   console.log('\x1b[36m', '----------------');
+
+  // Save the latest request to a file
+  const requestLog = {
+    timestamp: new Date().toISOString(),
+    url: _url.href,
+    headers: req.headers,
+  };
+  const logFilePath = path.join(__dirname, 'latestRequest.json');
+  writeFileSync(logFilePath, JSON.stringify(requestLog, null, 2), 'utf-8');
+
+  const logResponse = (
+    statusCode: number,
+    headers: Record<string, string>,
+    body: string,
+  ) => {
+    const responseLog = {
+      timestamp: new Date().toISOString(),
+      statusCode,
+      headers,
+      body,
+    };
+    const responseLogFilePath = path.join(__dirname, 'latestResponse.json');
+    writeFileSync(
+      responseLogFilePath,
+      JSON.stringify(responseLog, null, 2),
+      'utf-8',
+    );
+  };
+
   if (settings.fetchMode === FetchMode.CURL) {
-    //i mean if it works it works i guess, better than nothing
     let curl = `curl '${_url.href}'`;
     if (settings.useUserAgent) {
       curl += ` -H 'User-Agent: ${req.headers['user-agent']}'`;
@@ -145,6 +175,7 @@ const proxyRequest: Connect.SimpleHandleFunction = (req, res) => {
       if (stderr) {
         console.error(`stderr: ${stderr}`);
       }
+      logResponse(200, {}, stdout);
       res.statusCode = 200;
       res.write(stdout);
       res.end();
@@ -165,7 +196,7 @@ const proxyRequest: Connect.SimpleHandleFunction = (req, res) => {
     })
       .then(async res2 => [res2, await res2.text()] as const)
       .then(([res2, text]) => {
-        res.statusCode = res2.status;
+        const responseHeaders: Record<string, string> = {};
         res2.headers.forEach((val, key) => {
           if (
             !settings.disAllowResponseHeaders.includes(key) &&
@@ -175,6 +206,8 @@ const proxyRequest: Connect.SimpleHandleFunction = (req, res) => {
             res.setHeader(key, val);
           }
         });
+        logResponse(res2.status, responseHeaders, text);
+        res.statusCode = res2.status;
         res.write(text);
         res.end();
       })
@@ -198,6 +231,21 @@ const proxyRequest: Connect.SimpleHandleFunction = (req, res) => {
         res.end();
       },
     );
+
+    proxy.on('proxyRes', (proxyRes, req, res) => {
+      const chunks: Buffer[] = [];
+      proxyRes.on('data', chunk => chunks.push(chunk));
+      proxyRes.on('end', () => {
+        const body = Buffer.concat(chunks).toString('utf-8');
+        const responseHeaders: Record<string, string> = {};
+        for (const [key, value] of Object.entries(proxyRes.headers)) {
+          responseHeaders[key] = Array.isArray(value)
+            ? value.join(', ')
+            : value || '';
+        }
+        logResponse(proxyRes.statusCode || 200, responseHeaders, body);
+      });
+    });
   }
 };
 
