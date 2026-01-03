@@ -80,9 +80,15 @@ class FenrirRealmPlugin implements Plugin.PluginBase {
   }
 
   async parseNovel(novelPath: string): Promise<Plugin.SourceNovel> {
-    const html = await fetchApi(`${this.site}/series/${novelPath}`, {}).then(
-      r => r.text(),
-    );
+    let r = await fetchApi(`${this.site}/series/${novelPath}`, {
+      'headers': {
+        'host': 'fenrirealm.com',
+      },
+    });
+    if (!r.ok) {
+      throw new Error(r.statusText);
+    }
+    const html = await r.text();
     const loadedCheerio = loadCheerio(html);
 
     const novel: Plugin.SourceNovel = {
@@ -93,7 +99,7 @@ class FenrirRealmPlugin implements Plugin.PluginBase {
       )
         .map((i, el) => loadCheerio(el).text())
         .get()
-        .join('\n\n'),
+        .join('\n'),
     };
     // novel.artist = '';
     novel.author = loadedCheerio(
@@ -111,9 +117,19 @@ class FenrirRealmPlugin implements Plugin.PluginBase {
       .first()
       .text();
 
+    r = await fetchApi(`${this.site}/api/novels/chapter-list/${novelPath}`);
+    if (!r.ok) {
+      throw new Error(r.statusText);
+    }
     let chapters = await fetchApi(
       this.site + '/api/novels/chapter-list/' + novelPath,
-    ).then(r => r.json());
+    )
+      .then(r => r.json())
+      .catch(e => {
+        throw new Error(
+          'There was an error fetching the data from the server. Please try to open it in WebView',
+        );
+      });
 
     if (this.hideLocked) {
       chapters = chapters.filter((c: APIChapter) => !c.locked?.price);
@@ -144,18 +160,22 @@ class FenrirRealmPlugin implements Plugin.PluginBase {
   }
 
   async parseChapter(chapterPath: string): Promise<string> {
-    const page = await fetchApi(this.site + '/series/' + chapterPath, {}).then(
-      r => r.text(),
-    );
-    const chapter = loadCheerio(page)('[id^="reader-area-"]');
-    chapter
-      .contents()
-      .filter((_, node: Node) => {
-        return node.type === 'comment';
-      })
-      .remove();
-
-    return chapter.html() || '';
+    try {
+      const r = await fetchApi(
+        this.site + '/series/' + chapterPath.replace('/chapter-', '/'),
+        {
+          'headers': {
+            'host': 'fenrirealm.com',
+          },
+        },
+      );
+      return r.statusText;
+    } catch (e) {
+      let ret = (e as Error).message;
+      ret = ret + '\n' + this.site + '/series/' + chapterPath;
+      return ret;
+    }
+    // return loadCheerio(await r.text())('p').first().parent().html() || '';
   }
 
   async searchNovels(
